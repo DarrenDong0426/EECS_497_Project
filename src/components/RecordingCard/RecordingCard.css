@@ -1,0 +1,106 @@
+/* ─── Recordings List ─── */
+.recordings-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recordings-list-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 4px;
+}
+
+.community-content {
+  justify-content: flex-start !important;
+  padding-top: 24px !important;
+  gap: 16px !important;
+}
+
+/* ─── Recording Card ─── */
+.recording-card {
+  width: 100%;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recording-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recording-card-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.recording-card-duration {
+  font-size: 16px;
+  color: #888;
+  font-weight: 500;
+}
+
+.recording-card-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recording-card-controls .btn-play {
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+  border-radius: 50%;
+  min-height: unset;
+}
+
+.recording-card-controls .btn-skip {
+  padding: 10px 14px;
+  font-size: 16px;
+  min-height: unset;
+}
+
+.recording-card-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  margin-left: auto;
+}
+
+.recording-card-transcript {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #444;
+  background: #f5f2ed;
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid #e0dcd5;
+}
+
+/* ─── Empty State ─── */
+.empty-state {
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.empty-state-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.empty-state-hint {
+  font-size: 18px;
+  color: #888;
+  line-height: 1.5;
+}

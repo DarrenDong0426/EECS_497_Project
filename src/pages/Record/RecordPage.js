@@ -7,7 +7,7 @@ import SaveConfirm from './SaveConfirm';
 
 const API = 'http://localhost:5001';
 
-function RecordPage() {
+function RecordPage({ onNavigate }) {
   const [screen, setScreen] = useState('pre');
   const [recordedTime, setRecordedTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -209,7 +209,7 @@ function RecordPage() {
 
   switch (screen) {
     case 'pre':
-      return <PreRecord onRecord={handleRecord} error={error} />;
+      return <PreRecord onRecord={handleRecord} error={error} onNavigate={onNavigate} />;
     case 'while':
       return (
         <WhileRecord
@@ -218,6 +218,7 @@ function RecordPage() {
           onPause={handlePause}
           onSave={handleSave}
           startTime={recordedTime}
+          onNavigate={onNavigate}
         />
       );
     case 'playback':
@@ -229,6 +230,7 @@ function RecordPage() {
           onContinue={handleContinue}
           onRestart={handleRestart}
           onSave={() => handleSave(recordedTime)}
+          onNavigate={onNavigate}
         />
       );
     case 'share':
@@ -237,8 +239,10 @@ function RecordPage() {
           audioBlob={audioBlob}
           transcript={transcript}
           duration={recordedTime}
+          recordingId={recordingIdRef.current}
           onShare={handleShare}
           onNew={handleNew}
+          onNavigate={onNavigate}
         />
       );
     case 'save':
@@ -247,11 +251,13 @@ function RecordPage() {
           audioBlob={audioBlob}
           transcript={transcript}
           duration={recordedTime}
+          recordingId={recordingIdRef.current}
           onNew={handleNew}
+          onNavigate={onNavigate}
         />
       );
     default:
-      return <PreRecord onRecord={handleRecord} error={error} />;
+      return <PreRecord onRecord={handleRecord} error={error} onNavigate={onNavigate} />;
   }
 }
 

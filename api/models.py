@@ -25,5 +25,3 @@ class Recording(db.Model):
             'shared': self.shared,
             'created_at': self.created_at.isoformat(),
         }
-
-# TODO: Add more database classes here if needed (e.g., User, etc.)

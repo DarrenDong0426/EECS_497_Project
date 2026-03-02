@@ -3,7 +3,7 @@ import NavBar from '../../components/NavBar/NavBar';
 import Waveform from '../../components/Waveform/Waveform';
 import './Record.css';
 
-function PreRecord({ onRecord, error }) {
+function PreRecord({ onRecord, error, onNavigate }) {
   return (
     <div className="screen">
       <div className="screen-content">
@@ -26,7 +26,7 @@ function PreRecord({ onRecord, error }) {
           <p className="btn-record-hint">Tap to begin</p>
         </div>
       </div>
-      <NavBar active="record" />
+      <NavBar active="record" onNavigate={onNavigate} />
     </div>
   );
 }

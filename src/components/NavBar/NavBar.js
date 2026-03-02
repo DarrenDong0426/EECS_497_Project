@@ -15,7 +15,7 @@ function NavBar({ active = 'record', onNavigate }) {
         <button
           key={tab.id}
           className={`navbar-tab ${active === tab.id ? 'active' : ''}`}
-          onClick={() => onNavigate && onNavigate(tab.id)}
+          onClick={() => onNavigate(tab.id)}
         >
           {tab.label}
         </button>

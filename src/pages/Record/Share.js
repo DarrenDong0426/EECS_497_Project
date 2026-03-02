@@ -1,11 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import NavBar from '../../components/NavBar/NavBar';
 import Waveform from '../../components/Waveform/Waveform';
+import RecordingCard from '../../components/RecordingCard/RecordingCard';
 import './Record.css';
 
-function Share({ audioBlob, transcript, duration = 0, onShare, onNew }) {
+const API = 'http://localhost:5001';
+
+function Share({ audioBlob, transcript, duration = 0, recordingId, onShare, onNew, onNavigate }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState(0);
+  const [relatedRecordings, setRelatedRecordings] = useState(null);
+  const [loadingRelated, setLoadingRelated] = useState(false);
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -49,9 +54,24 @@ function Share({ audioBlob, transcript, duration = 0, onShare, onNew }) {
 
   const formatTime = (s) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
+  const handleFindRelated = async () => {
+    setLoadingRelated(true);
+    try {
+      const res = await fetch(`${API}/api/recordings?user_id=temp_user`);
+      const data = await res.json();
+      const others = data.filter((r) => String(r.id) !== String(recordingId));
+      setRelatedRecordings(others);
+    } catch (err) {
+      console.error('Failed to fetch recordings:', err);
+      setRelatedRecordings([]);
+    } finally {
+      setLoadingRelated(false);
+    }
+  };
+
   return (
     <div className="screen">
-      <div className="screen-content">
+      <div className="screen-content" style={{ justifyContent: 'flex-start', paddingTop: 24 }}>
         <div className="status-banner saved">Your Recording Was Saved!</div>
         <p className="page-subtitle">You can listen to it again or share it with the community</p>
 
@@ -83,8 +103,36 @@ function Share({ audioBlob, transcript, duration = 0, onShare, onNew }) {
         <div className="btn-row">
           <button className="btn btn-new" onClick={onNew} style={{ flex: 1 }}>Record Something New</button>
         </div>
+
+        {relatedRecordings === null && (
+          <div className="btn-row">
+            <button
+              className="btn btn-related"
+              onClick={handleFindRelated}
+              disabled={loadingRelated}
+              style={{ flex: 1 }}
+            >
+              {loadingRelated ? 'Searching...' : 'View Related Past Recordings'}
+            </button>
+          </div>
+        )}
+
+        {relatedRecordings !== null && (
+          <div className="recordings-list">
+            <h2 className="recordings-list-title">Related Past Recordings</h2>
+            {relatedRecordings.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-state-text">No related past recordings found.</p>
+              </div>
+            ) : (
+              relatedRecordings.map((rec) => (
+                <RecordingCard key={rec.id} recording={rec} />
+              ))
+            )}
+          </div>
+        )}
       </div>
-      <NavBar active="record" />
+      <NavBar active="record" onNavigate={onNavigate} />
     </div>
   );
 }

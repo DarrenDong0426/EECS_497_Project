@@ -3,7 +3,7 @@ import NavBar from '../../components/NavBar/NavBar';
 import Waveform from '../../components/Waveform/Waveform';
 import './Record.css';
 
-function PlayBack({ audioBlob, transcript, duration = 180, currentTime = 0, onContinue, onRestart, onSave }) {
+function PlayBack({ audioBlob, transcript, duration = 180, currentTime = 0, onContinue, onRestart, onSave, onNavigate }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const audioRef = useRef(null);
@@ -85,7 +85,7 @@ function PlayBack({ audioBlob, transcript, duration = 180, currentTime = 0, onCo
           <button className="btn btn-save" onClick={onSave} style={{ flex: 1 }}>Save Recording</button>
         </div>
       </div>
-      <NavBar active="record" />
+      <NavBar active="record" onNavigate={onNavigate} />
     </div>
   );
 }

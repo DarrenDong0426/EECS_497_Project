@@ -3,7 +3,7 @@ import NavBar from '../../components/NavBar/NavBar';
 import Waveform from '../../components/Waveform/Waveform';
 import './Record.css';
 
-function WhileRecord({ analyserNode, transcript, onPause, onSave, maxDuration = 180, startTime = 0 }) {
+function WhileRecord({ analyserNode, transcript, onPause, onSave, maxDuration = 180, startTime = 0, onNavigate }) {
   const [elapsed, setElapsed] = useState(startTime);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function WhileRecord({ analyserNode, transcript, onPause, onSave, maxDuration = 
           </button>
         </div>
       </div>
-      <NavBar active="record" />
+      <NavBar active="record" onNavigate={onNavigate} />
     </div>
   );
 }

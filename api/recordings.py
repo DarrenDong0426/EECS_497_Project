@@ -10,7 +10,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 recordings_bp = Blueprint('recordings', __name__)
 
-# TODO: Replace this with actual user authentication and management in the future. For now, we use a temporary user ID for all recordings.
 TEMP_USER_ID = 'temp_user'
 
 
@@ -44,7 +43,11 @@ def upload_recording():
 
 @recordings_bp.route('/api/recordings', methods=['GET'])
 def list_recordings():
-    recordings = Recording.query.order_by(Recording.created_at.desc()).all()
+    user_id = request.args.get('user_id')
+    query = Recording.query
+    if user_id:
+        query = query.filter_by(user_id=user_id)
+    recordings = query.order_by(Recording.created_at.desc()).all()
     return jsonify([r.to_dict() for r in recordings])
 
 
@@ -73,6 +76,49 @@ def share_recording(recording_id):
     recording.shared = True
     db.session.commit()
     return jsonify({'message': 'Recording shared', 'recording': recording.to_dict()})
+
+
+@recordings_bp.route('/api/recordings/<int:recording_id>/similar', methods=['GET'])
+def find_similar(recording_id):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    target = Recording.query.get_or_404(recording_id)
+
+    if not target.transcript or not target.transcript.strip():
+        return jsonify([])
+
+    # Get all other recordings that have transcripts
+    others = Recording.query.filter(
+        Recording.id != recording_id,
+        Recording.transcript != '',
+        Recording.transcript.isnot(None),
+    ).all()
+
+    if not others:
+        return jsonify([])
+
+    # Build corpus: target first, then all others
+    corpus = [target.transcript] + [r.transcript for r in others]
+
+    vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(corpus)
+
+    # Cosine similarity between target (index 0) and all others
+    similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
+
+    # Pair scores with recordings, filter out zero similarity, sort descending
+    results = []
+    for i, score in enumerate(similarities):
+        if score > 0.0:
+            rec = others[i].to_dict()
+            rec['similarity'] = round(float(score), 3)
+            results.append(rec)
+
+    results.sort(key=lambda x: x['similarity'], reverse=True)
+
+    # Return top 10
+    return jsonify(results[:10])
 
 
 @recordings_bp.route('/api/recordings/<int:recording_id>/audio', methods=['GET'])

@@ -308,6 +308,16 @@ body {
 }
 .btn-new:hover { background: #ece8e1; }
 
+/* Related */
+.btn-related {
+  background: #fff;
+  color: #1a5632;
+  border: 2px solid #1a5632;
+  flex: 1;
+}
+.btn-related:hover { background: #e8f5e9; }
+.btn-related:disabled { color: #888; border-color: #ccc; }
+
 /* ─── Playback controls ─── */
 .playback-controls {
   display: flex;
@@ -355,4 +365,133 @@ body {
 .transcript-placeholder {
   color: #999;
   font-style: italic;
+}
+
+/* ─── Similar Recordings ─── */
+.btn-similar {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Lexend', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 18px 32px;
+  min-height: 64px;
+  background: #f5f0e8;
+  color: #555;
+  border: 2px solid #ddd;
+  transition: all 0.15s ease;
+}
+
+.btn-similar:hover {
+  background: #ece8e1;
+  border-color: #bbb;
+}
+
+.btn-similar:active {
+  transform: scale(0.97);
+}
+
+.btn-similar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.similar-section {
+  width: 100%;
+}
+
+.similar-header {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 16px;
+}
+
+.similar-empty {
+  font-size: 18px;
+  color: #888;
+  text-align: center;
+  padding: 20px;
+  background: #f5f2ed;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.similar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.similar-card {
+  background: #fff;
+  border: 2px solid #e0dcd5;
+  border-radius: 14px;
+  padding: 16px;
+  transition: border-color 0.15s ease;
+}
+
+.similar-card:hover {
+  border-color: #bbb;
+}
+
+.similar-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.btn-similar-play {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid #222;
+  background: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-similar-play:hover {
+  background: #f5f2ed;
+}
+
+.btn-similar-play:active {
+  transform: scale(0.95);
+}
+
+.similar-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.similar-card-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.similar-card-meta {
+  font-size: 16px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.similar-card-transcript {
+  font-size: 17px;
+  color: #555;
+  line-height: 1.5;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
