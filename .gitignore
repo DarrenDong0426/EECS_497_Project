@@ -1,0 +1,16 @@
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+
+# Node
+frontend/node_modules/
+
+# DB is preserved locally but not committed
+backend/instance/app.db
+
+# PIDs
+.pids/
+
+# Env
+.env

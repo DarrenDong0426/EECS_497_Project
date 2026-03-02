@@ -1,0 +1,358 @@
+/* ═══════════════════════════════════════════
+   RECORD PAGE — Elderly-Friendly Design
+   Large text, high contrast, warm tones,
+   clear labels, big touch targets
+   ═══════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #fffdf7;
+  color: #222;
+  font-family: 'Lexend', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.screen {
+  max-width: 480px;
+  margin: 0 auto;
+  background: #fffdf7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px 120px;
+  gap: 28px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Headings & Text ─── */
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.page-subtitle {
+  font-size: 20px;
+  font-weight: 400;
+  color: #555;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+/* ─── Status Banners ─── */
+.status-banner {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.status-banner.recording {
+  background: #fdecea;
+  color: #c0392b;
+  border: 2px solid #e6b0aa;
+}
+
+.status-banner.recording .pulse-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #c0392b;
+  margin-right: 10px;
+  vertical-align: middle;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.status-banner.saved {
+  background: #e8f5e9;
+  color: #1a5632;
+  border: 2px solid #a5d6a7;
+}
+
+.status-banner.shared {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 2px solid #90caf9;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* ─── Timer ─── */
+.timer {
+  text-align: center;
+}
+
+.timer-time {
+  font-size: 52px;
+  font-weight: 700;
+  color: #222;
+  letter-spacing: 2px;
+}
+
+.timer-max {
+  font-size: 20px;
+  color: #888;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* ─── Progress Bar ─── */
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e0dcd5;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #c0392b;
+  border-radius: 5px;
+  transition: width 0.5s linear;
+}
+
+/* ─── Buttons ─── */
+.btn {
+  border: none;
+  border-radius: 14px;
+  font-family: 'Lexend', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 18px 32px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Big red record button */
+.btn-record-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.btn-record {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #c0392b;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  border: 6px solid #a93226;
+  cursor: pointer;
+  font-family: 'Lexend', sans-serif;
+  box-shadow: 0 6px 24px rgba(192, 57, 43, 0.3);
+  transition: all 0.15s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.btn-record:hover {
+  background: #a93226;
+}
+
+.btn-record:active {
+  transform: scale(0.95);
+}
+
+.btn-record-ring {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  border: 3px solid rgba(192, 57, 43, 0.2);
+  animation: ringPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.btn-record-outer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes ringPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0; }
+}
+
+.btn-record-hint {
+  font-size: 18px;
+  color: #888;
+  text-align: center;
+}
+
+/* Pause */
+.btn-pause {
+  background: #f5f2ed;
+  color: #222;
+  border: 2px solid #ccc;
+  flex: 1;
+}
+.btn-pause:hover { background: #ece8e1; }
+
+/* Save */
+.btn-save {
+  background: #1a5632;
+  color: #fff;
+  flex: 1;
+  box-shadow: 0 4px 12px rgba(26, 86, 50, 0.2);
+}
+.btn-save:hover { background: #145228; }
+
+/* Play */
+.btn-play {
+  background: #fff;
+  color: #222;
+  border: 3px solid #222;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 28px;
+}
+.btn-play:hover { background: #f5f2ed; }
+
+/* Skip */
+.btn-skip {
+  background: #f5f2ed;
+  color: #555;
+  border: 2px solid #ccc;
+  padding: 14px 20px;
+  font-size: 18px;
+  border-radius: 12px;
+  min-height: 56px;
+}
+.btn-skip:hover { border-color: #888; }
+
+/* Continue */
+.btn-continue {
+  background: #1a5632;
+  color: #fff;
+  flex: 1;
+  box-shadow: 0 4px 12px rgba(26, 86, 50, 0.2);
+}
+.btn-continue:hover { background: #145228; }
+
+/* Restart */
+.btn-restart {
+  background: #f5f2ed;
+  color: #c0392b;
+  border: 2px solid #e6b0aa;
+  flex: 1;
+}
+.btn-restart:hover { background: #fdecea; }
+
+/* Share */
+.btn-share {
+  background: #1565c0;
+  color: #fff;
+  flex: 1;
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+}
+.btn-share:hover { background: #0d47a1; }
+
+/* New */
+.btn-new {
+  background: #f5f2ed;
+  color: #222;
+  border: 2px solid #ccc;
+  flex: 1;
+}
+.btn-new:hover { background: #ece8e1; }
+
+/* ─── Playback controls ─── */
+.playback-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* ─── Error ─── */
+.error-msg {
+  color: #c0392b;
+  font-size: 18px;
+  text-align: center;
+  padding: 16px;
+  background: #fdecea;
+  border-radius: 12px;
+  border: 2px solid #e6b0aa;
+  line-height: 1.5;
+}
+
+/* ─── Transcript ─── */
+.transcript-box {
+  width: 100%;
+  background: #f5f2ed;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 16px 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.transcript-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.transcript-text {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #222;
+}
+
+.transcript-placeholder {
+  color: #999;
+  font-style: italic;
+}
