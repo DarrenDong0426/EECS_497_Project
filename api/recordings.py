@@ -44,9 +44,12 @@ def upload_recording():
 @recordings_bp.route('/api/recordings', methods=['GET'])
 def list_recordings():
     user_id = request.args.get('user_id')
+    exclude_user = request.args.get('exclude_user')
     query = Recording.query
     if user_id:
         query = query.filter_by(user_id=user_id)
+    if exclude_user:
+        query = query.filter(Recording.user_id != exclude_user)
     recordings = query.order_by(Recording.created_at.desc()).all()
     return jsonify([r.to_dict() for r in recordings])
 

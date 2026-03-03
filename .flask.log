@@ -3,13 +3,31 @@
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://127.0.0.1:5001
 [33mPress CTRL+C to quit[0m
-127.0.0.1 - - [02/Mar/2026 16:29:30] "[35m[1mPOST /api/recordings HTTP/1.1[0m" 201 -
-127.0.0.1 - - [02/Mar/2026 16:29:31] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
-127.0.0.1 - - [02/Mar/2026 16:29:39] "[35m[1mPOST /api/recordings HTTP/1.1[0m" 201 -
-127.0.0.1 - - [02/Mar/2026 16:29:41] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
-127.0.0.1 - - [02/Mar/2026 16:29:41] "[35m[1mGET /api/recordings/1/audio HTTP/1.1[0m" 206 -
-127.0.0.1 - - [02/Mar/2026 16:29:41] "[35m[1mGET /api/recordings/1/audio HTTP/1.1[0m" 206 -
-127.0.0.1 - - [02/Mar/2026 16:29:41] "[35m[1mGET /api/recordings/1/audio HTTP/1.1[0m" 206 -
-127.0.0.1 - - [02/Mar/2026 16:29:43] "OPTIONS /api/recordings/2/share HTTP/1.1" 200 -
-127.0.0.1 - - [02/Mar/2026 16:29:43] "PUT /api/recordings/2/share HTTP/1.1" 200 -
-127.0.0.1 - - [02/Mar/2026 16:29:44] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/10/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/9/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/6/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/8/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/7/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/5/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/3/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/4/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/1/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/10/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/2/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/9/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/4/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/7/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/8/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/6/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/5/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/3/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/4/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/1/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:23] "[35m[1mGET /api/recordings/2/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:28] "[35m[1mPOST /api/recordings HTTP/1.1[0m" 201 -
+127.0.0.1 - - [03/Mar/2026 12:35:28] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 12:35:28] "GET /api/recordings?user_id=temp_user HTTP/1.1" 200 -
+127.0.0.1 - - [03/Mar/2026 12:35:28] "[35m[1mGET /api/recordings/11/audio HTTP/1.1[0m" 206 -
+127.0.0.1 - - [03/Mar/2026 12:35:28] "[35m[1mGET /api/recordings/11/audio HTTP/1.1[0m" 206 -

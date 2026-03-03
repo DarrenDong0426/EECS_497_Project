@@ -2,8 +2,8 @@ import React, { useState, useRef, useCallback } from 'react';
 import PreRecord from './PreRecord';
 import WhileRecord from './WhileRecord';
 import PlayBack from './PlayBack';
-import Share from './Share';
-import SaveConfirm from './SaveConfirm';
+import MyRelated from './MyRelated';
+import OthersRelated from './OthersRelated';
 
 const API = 'http://localhost:5001';
 
@@ -43,23 +43,6 @@ function RecordPage({ onNavigate }) {
       console.error('Upload failed:', err);
     }
     return null;
-  };
-
-  const shareRecording = async () => {
-    const id = recordingIdRef.current;
-    if (!id) {
-      console.error('No recording ID to share');
-      return;
-    }
-    try {
-      const res = await fetch(`${API}/api/recordings/${id}/share`, {
-        method: 'PUT',
-      });
-      const data = await res.json();
-      console.log('Share response:', data);
-    } catch (err) {
-      console.error('Share failed:', err);
-    }
   };
 
   const startTranscription = () => {
@@ -113,8 +96,6 @@ function RecordPage({ onNavigate }) {
 
   const stopRecordingAndGetBlob = () => {
     return new Promise((resolve) => {
-      stopTranscription();
-
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
@@ -129,10 +110,12 @@ function RecordPage({ onNavigate }) {
         mediaRecorderRef.current.onstop = () => {
           const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
           setAudioBlob(blob);
+          stopTranscription();
           resolve(blob);
         };
         mediaRecorderRef.current.stop();
       } else {
+        stopTranscription();
         resolve(null);
       }
     });
@@ -190,21 +173,18 @@ function RecordPage({ onNavigate }) {
   };
 
   const handleSave = async (elapsed) => {
+    const finalTranscript = transcriptRef.current;
     const blob = await stopRecordingAndGetBlob();
     const dur = elapsed !== undefined ? elapsed : recordedTime;
     setRecordedTime(dur);
-    await uploadRecording(blob, dur, transcriptRef.current);
-    setScreen('share');
+    await new Promise((r) => setTimeout(r, 300));
+    const transcript = transcriptRef.current || finalTranscript;
+    await uploadRecording(blob, dur, transcript);
+    setScreen('myrelated');
   };
 
   const handleContinue = () => startRecording();
   const handleRestart = () => { reset(); setScreen('pre'); };
-
-  const handleShare = async () => {
-    await shareRecording();
-    setScreen('save');
-  };
-
   const handleNew = () => { reset(); setScreen('pre'); };
 
   switch (screen) {
@@ -233,27 +213,22 @@ function RecordPage({ onNavigate }) {
           onNavigate={onNavigate}
         />
       );
-    case 'share':
+    case 'myrelated':
       return (
-        <Share
-          audioBlob={audioBlob}
-          transcript={transcript}
-          duration={recordedTime}
+        <MyRelated
           recordingId={recordingIdRef.current}
-          onShare={handleShare}
-          onNew={handleNew}
           onNavigate={onNavigate}
+          onViewOthers={() => setScreen('othersrelated')}
+          onNew={handleNew}
         />
       );
-    case 'save':
+    case 'othersrelated':
       return (
-        <SaveConfirm
-          audioBlob={audioBlob}
-          transcript={transcript}
-          duration={recordedTime}
+        <OthersRelated
           recordingId={recordingIdRef.current}
-          onNew={handleNew}
           onNavigate={onNavigate}
+          onBack={() => setScreen('myrelated')}
+          onNew={handleNew}
         />
       );
     default:
