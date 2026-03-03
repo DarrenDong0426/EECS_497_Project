@@ -1,16 +1,13 @@
 # Python
-backend/venv/
 __pycache__/
 *.pyc
 
 # Node
-frontend/node_modules/
+node_modules/
 
-# DB is preserved locally but not committed
-backend/instance/app.db
+# Logs
+.flask.log
+.react.log
 
-# PIDs
-.pids/
-
-# Env
-.env
+# OS
+.DS_Store
