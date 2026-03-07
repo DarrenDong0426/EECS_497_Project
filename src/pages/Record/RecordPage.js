@@ -45,6 +45,23 @@ function RecordPage({ onNavigate }) {
     return null;
   };
 
+  const shareRecording = async () => {
+    const id = recordingIdRef.current;
+    if (!id) {
+      console.error('No recording ID to share');
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/api/recordings/${id}/share`, {
+        method: 'PUT',
+      });
+      const data = await res.json();
+      console.log('Share response:', data);
+    } catch (err) {
+      console.error('Share failed:', err);
+    }
+  };
+
   const startTranscription = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
@@ -220,6 +237,7 @@ function RecordPage({ onNavigate }) {
           onNavigate={onNavigate}
           onViewOthers={() => setScreen('othersrelated')}
           onNew={handleNew}
+          onShare={shareRecording}
         />
       );
     case 'othersrelated':

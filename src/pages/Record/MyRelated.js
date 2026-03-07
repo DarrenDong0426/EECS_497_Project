@@ -5,9 +5,10 @@ import './Record.css';
 
 const API = 'http://localhost:5001';
 
-function MyRelated({ recordingId, onNavigate, onViewOthers, onNew }) {
+function MyRelated({ recordingId, onNavigate, onViewOthers, onNew, onShare }) {
   const [recordings, setRecordings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     const fetchRelated = async () => {
@@ -30,8 +31,15 @@ function MyRelated({ recordingId, onNavigate, onViewOthers, onNew }) {
   return (
     <div className="screen">
       <div className="screen-content" style={{ justifyContent: 'flex-start', paddingTop: 24 }}>
-        <div className="status-banner saved">Recording Saved!</div>
+        <div className="status-banner saved">{shared ? 'Shared Successfully!' : 'Recording Saved!'}</div>
 
+        <div className="btn-row">
+          {!shared && (
+            <button className="btn btn-share" onClick={async () => { await onShare(); setShared(true); }} style={{ flex: 1 }}>
+              Share with Community
+            </button>
+          )}
+        </div>
         <div className="btn-row">
           <button className="btn btn-save" onClick={onNew} style={{ flex: 1 }}>
             Record Something New
