@@ -3,7 +3,7 @@ import NavBar from '../../components/NavBar/NavBar';
 import RecordingCard from '../../components/RecordingCard/RecordingCard';
 import './Record.css';
 
-const API = 'http://localhost:5001';
+import API from '../../config';
 
 function MyRelated({ recordingId, onNavigate, onViewOthers, onNew, onShare }) {
   const [recordings, setRecordings] = useState([]);

@@ -9,15 +9,16 @@ function WhileRecord({ analyserNode, transcript, onPause, onSave, maxDuration = 
   useEffect(() => {
     const interval = setInterval(() => {
       setElapsed((prev) => {
-        if (prev >= maxDuration) {
+        if (prev + 1 >= maxDuration) {
           clearInterval(interval);
+          onSave(maxDuration);
           return maxDuration;
         }
         return prev + 1;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [maxDuration]);
+  }, [maxDuration, onSave]);
 
   const formatTime = (s) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
   const progress = (elapsed / maxDuration) * 100;

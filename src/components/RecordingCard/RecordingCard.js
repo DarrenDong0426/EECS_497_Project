@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './RecordingCard.css';
 
-const API = 'http://localhost:5001';
+import API from '../../config';
 
 function RecordingCard({ recording }) {
   const [isPlaying, setIsPlaying] = useState(false);

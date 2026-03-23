@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Record.css';
 
-const API = 'http://localhost:5001';
+import API from '../../config';
 
 function SimilarRecordings({ recordingId }) {
   const [results, setResults] = useState([]);

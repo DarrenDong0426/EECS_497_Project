@@ -5,7 +5,7 @@ import PlayBack from './PlayBack';
 import MyRelated from './MyRelated';
 import OthersRelated from './OthersRelated';
 
-const API = 'http://localhost:5001';
+import API from '../../config';
 
 function RecordPage({ onNavigate }) {
   const [screen, setScreen] = useState('pre');
