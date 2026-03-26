@@ -1,12 +1,14 @@
 import os
 from datetime import datetime
 from flask import Blueprint, jsonify, request, send_from_directory
-from models import db, Recording
+from models import db, Recording, Reply, RecordingLike
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'recordings')
+REPLIES_FOLDER = os.path.join(UPLOAD_FOLDER, 'replies')
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(REPLIES_FOLDER, exist_ok=True)
 
 recordings_bp = Blueprint('recordings', __name__)
 
@@ -57,7 +59,9 @@ def list_recordings():
 @recordings_bp.route('/api/recordings/<int:recording_id>', methods=['GET'])
 def get_recording(recording_id):
     recording = Recording.query.get_or_404(recording_id)
-    return jsonify(recording.to_dict())
+    data = recording.to_dict()
+    data['liked_by_me'] = RecordingLike.query.filter_by(recording_id=recording_id, user_id=TEMP_USER_ID).first() is not None
+    return jsonify(data)
 
 
 @recordings_bp.route('/api/recordings/<int:recording_id>', methods=['DELETE'])
@@ -67,6 +71,12 @@ def delete_recording(recording_id):
     filepath = os.path.join(UPLOAD_FOLDER, recording.filename)
     if os.path.exists(filepath):
         os.remove(filepath)
+
+    for reply in recording.replies.all():
+        if reply.filename:
+            reply_path = os.path.join(REPLIES_FOLDER, reply.filename)
+            if os.path.exists(reply_path):
+                os.remove(reply_path)
 
     db.session.delete(recording)
     db.session.commit()
@@ -81,6 +91,68 @@ def share_recording(recording_id):
     return jsonify({'message': 'Recording shared', 'recording': recording.to_dict()})
 
 
+@recordings_bp.route('/api/recordings/<int:recording_id>/like', methods=['POST'])
+def toggle_like(recording_id):
+    Recording.query.get_or_404(recording_id)
+
+    existing = RecordingLike.query.filter_by(recording_id=recording_id, user_id=TEMP_USER_ID).first()
+    if existing:
+        db.session.delete(existing)
+        liked = False
+    else:
+        db.session.add(RecordingLike(recording_id=recording_id, user_id=TEMP_USER_ID))
+        liked = True
+
+    db.session.commit()
+    likes_count = RecordingLike.query.filter_by(recording_id=recording_id).count()
+
+    return jsonify({'liked': liked, 'likes_count': likes_count})
+
+
+@recordings_bp.route('/api/recordings/<int:recording_id>/replies', methods=['GET'])
+def list_replies(recording_id):
+    Recording.query.get_or_404(recording_id)
+    replies = Reply.query.filter_by(recording_id=recording_id).order_by(Reply.created_at.desc()).all()
+    return jsonify([reply.to_dict() for reply in replies])
+
+
+@recordings_bp.route('/api/recordings/<int:recording_id>/replies', methods=['POST'])
+def create_reply(recording_id):
+    Recording.query.get_or_404(recording_id)
+
+    text = request.form.get('text', '').strip()
+    duration = request.form.get('duration', 0, type=int)
+    audio = request.files.get('audio')
+    filename = None
+
+    if audio:
+        filename = f"reply_{recording_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.webm"
+        audio.save(os.path.join(REPLIES_FOLDER, filename))
+
+    if not text and not filename:
+        return jsonify({'error': 'Reply must include text or audio'}), 400
+
+    reply = Reply(
+        recording_id=recording_id,
+        user_id=TEMP_USER_ID,
+        text=text,
+        filename=filename,
+        duration=duration,
+    )
+    db.session.add(reply)
+    db.session.commit()
+
+    return jsonify({'message': 'Reply created', 'reply': reply.to_dict(), 'replies_count': Reply.query.filter_by(recording_id=recording_id).count()}), 201
+
+
+@recordings_bp.route('/api/replies/<int:reply_id>/audio', methods=['GET'])
+def get_reply_audio_file(reply_id):
+    reply = Reply.query.get_or_404(reply_id)
+    if not reply.filename:
+        return jsonify({'error': 'This reply does not have audio'}), 404
+    return send_from_directory(REPLIES_FOLDER, reply.filename)
+
+
 @recordings_bp.route('/api/recordings/<int:recording_id>/similar', methods=['GET'])
 def find_similar(recording_id):
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -91,7 +163,6 @@ def find_similar(recording_id):
     if not target.transcript or not target.transcript.strip():
         return jsonify([])
 
-    # Get all other recordings that have transcripts
     others = Recording.query.filter(
         Recording.id != recording_id,
         Recording.transcript != '',
@@ -101,16 +172,13 @@ def find_similar(recording_id):
     if not others:
         return jsonify([])
 
-    # Build corpus: target first, then all others
     corpus = [target.transcript] + [r.transcript for r in others]
 
     vectorizer = TfidfVectorizer(stop_words='english')
     tfidf_matrix = vectorizer.fit_transform(corpus)
 
-    # Cosine similarity between target (index 0) and all others
     similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
 
-    # Pair scores with recordings, filter out zero similarity, sort descending
     results = []
     for i, score in enumerate(similarities):
         if score > 0.0:
@@ -120,7 +188,6 @@ def find_similar(recording_id):
 
     results.sort(key=lambda x: x['similarity'], reverse=True)
 
-    # Return top 10
     return jsonify(results[:10])
 
 

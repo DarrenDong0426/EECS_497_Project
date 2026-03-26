@@ -3,7 +3,19 @@ import NavBar from '../../components/NavBar/NavBar';
 import Waveform from '../../components/Waveform/Waveform';
 import './Record.css';
 
-function PlayBack({ audioBlob, transcript, duration = 180, currentTime = 0, onContinue, onRestart, onSave, onNavigate }) {
+function PlayBack({
+  audioBlob,
+  transcript,
+  duration = 180,
+  currentTime = 0,
+  onContinue,
+  onRestart,
+  onSave,
+  onNavigate,
+  title = 'Listen to Your Recording',
+  subtitle = 'Press play to hear what you recorded',
+  saveLabel = 'Save Recording',
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const audioRef = useRef(null);
@@ -52,8 +64,8 @@ function PlayBack({ audioBlob, transcript, duration = 180, currentTime = 0, onCo
   return (
     <div className="screen">
       <div className="screen-content">
-        <h1 className="page-title">Listen to Your Recording</h1>
-        <p className="page-subtitle">Press play to hear what you recorded</p>
+        <h1 className="page-title">{title}</h1>
+        <p className="page-subtitle">{subtitle}</p>
 
         <div className="timer">
           <div className="timer-time">{formatTime(time)}</div>
@@ -82,7 +94,7 @@ function PlayBack({ audioBlob, transcript, duration = 180, currentTime = 0, onCo
           <button className="btn btn-restart" onClick={onRestart}>Start Over</button>
         </div>
         <div className="btn-row">
-          <button className="btn btn-save" onClick={onSave} style={{ flex: 1 }}>Save Recording</button>
+          <button className="btn btn-save" onClick={onSave} style={{ flex: 1 }}>{saveLabel}</button>
         </div>
       </div>
       <NavBar active="record" onNavigate={onNavigate} />

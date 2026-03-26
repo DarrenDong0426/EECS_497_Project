@@ -3,7 +3,10 @@ import './RecordingCard.css';
 
 import API from '../../config';
 
-function RecordingCard({ recording }) {
+function RecordingCard({
+  recording,
+  actions,
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(recording.duration || 0);
@@ -81,6 +84,17 @@ function RecordingCard({ recording }) {
       {recording.transcript && (
         <div className="recording-card-transcript">
           {recording.transcript}
+        </div>
+      )}
+
+      {actions && (
+        <div className="recording-card-social">
+          <button className="btn btn-like" onClick={() => actions.onToggleLike(recording.id)}>
+            {actions.liked ? '❤️ Liked' : '🤍 Like'} ({actions.likesCount || 0})
+          </button>
+          <button className="btn btn-replies-link" onClick={() => actions.onOpenReplies(recording.id)}>
+            View Replies ({actions.repliesCount || 0})
+          </button>
         </div>
       )}
     </div>

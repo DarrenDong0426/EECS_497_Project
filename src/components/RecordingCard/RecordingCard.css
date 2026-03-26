@@ -1,34 +1,30 @@
-/* ─── Recordings List ─── */
 .recordings-list {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .recordings-list-title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  color: #222;
-  margin-bottom: 4px;
+  color: #1f2937;
+  margin: 8px 0;
 }
 
 .community-content {
-  justify-content: flex-start !important;
-  padding-top: 24px !important;
-  gap: 16px !important;
+  padding-bottom: 90px;
 }
 
-/* ─── Recording Card ─── */
 .recording-card {
-  width: 100%;
   background: #fff;
-  border: 2px solid #ddd;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .recording-card-header {
@@ -38,69 +34,118 @@
 }
 
 .recording-card-date {
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
+  color: #6b7280;
+  font-size: 13px;
 }
 
 .recording-card-duration {
-  font-size: 16px;
-  color: #888;
-  font-weight: 500;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .recording-card-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .recording-card-controls .btn-play {
-  width: 56px;
-  height: 56px;
-  font-size: 22px;
-  border-radius: 50%;
-  min-height: unset;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: none;
+  background: #ef4444;
+  color: white;
 }
 
 .recording-card-controls .btn-skip {
-  padding: 10px 14px;
-  font-size: 16px;
-  min-height: unset;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
 }
 
 .recording-card-time {
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
   margin-left: auto;
+  color: #6b7280;
+  font-size: 12px;
 }
 
 .recording-card-transcript {
-  font-size: 18px;
-  line-height: 1.6;
-  color: #444;
-  background: #f5f2ed;
-  border-radius: 10px;
-  padding: 14px 16px;
-  border: 1px solid #e0dcd5;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.4;
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 8px;
 }
 
-/* ─── Empty State ─── */
-.empty-state {
-  text-align: center;
-  padding: 32px 24px;
+.recording-card-social {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.empty-state-text {
-  font-size: 20px;
+.btn-like,
+.btn-replies-link {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.replies-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.back-link {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  padding: 0;
   font-weight: 600;
-  color: #555;
-  margin-bottom: 8px;
+  text-align: left;
 }
 
-.empty-state-hint {
-  font-size: 18px;
-  color: #888;
-  line-height: 1.5;
+.reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.reply-form textarea {
+  width: 100%;
+  min-height: 70px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  resize: vertical;
+}
+
+.reply-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reply-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+}
+
+.reply-meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 6px;
 }

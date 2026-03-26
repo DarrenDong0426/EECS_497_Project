@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PreRecord from './PreRecord';
 import WhileRecord from './WhileRecord';
 import PlayBack from './PlayBack';
@@ -7,7 +7,7 @@ import OthersRelated from './OthersRelated';
 
 import API from '../../config';
 
-function RecordPage({ onNavigate }) {
+function RecordPage({ onNavigate, replyTargetRecordingId = null, onReplyComplete }) {
   const [screen, setScreen] = useState('pre');
   const [recordedTime, setRecordedTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -22,6 +22,16 @@ function RecordPage({ onNavigate }) {
   const recognitionRef = useRef(null);
   const transcriptRef = useRef('');
   const recordingIdRef = useRef(null);
+
+  const isReplyMode = !!replyTargetRecordingId;
+
+  useEffect(() => {
+    setScreen('pre');
+    setRecordedTime(0);
+    setAudioBlob(null);
+    setTranscript('');
+    transcriptRef.current = '';
+  }, [replyTargetRecordingId]);
 
   const uploadRecording = async (blob, dur, text) => {
     if (!blob) return null;
@@ -45,6 +55,27 @@ function RecordPage({ onNavigate }) {
     return null;
   };
 
+  const postReplyRecording = async (blob, dur, text) => {
+    if (!blob || !replyTargetRecordingId) return;
+    try {
+      const formData = new FormData();
+      formData.append('audio', blob, 'reply.webm');
+      formData.append('duration', dur);
+      if (text) {
+        formData.append('text', text);
+      }
+      await fetch(`${API}/api/recordings/${replyTargetRecordingId}/replies`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (onReplyComplete) {
+        onReplyComplete(replyTargetRecordingId);
+      }
+    } catch (err) {
+      console.error('Reply upload failed:', err);
+    }
+  };
+
   const shareRecording = async () => {
     const id = recordingIdRef.current;
     if (!id) {
@@ -52,11 +83,9 @@ function RecordPage({ onNavigate }) {
       return;
     }
     try {
-      const res = await fetch(`${API}/api/recordings/${id}/share`, {
+      await fetch(`${API}/api/recordings/${id}/share`, {
         method: 'PUT',
       });
-      const data = await res.json();
-      console.log('Share response:', data);
     } catch (err) {
       console.error('Share failed:', err);
     }
@@ -78,7 +107,7 @@ function RecordPage({ onNavigate }) {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         if (result.isFinal) {
-          finalText += result[0].transcript + ' ';
+          finalText += `${result[0].transcript} `;
           transcriptRef.current = finalText;
         } else {
           interimText += result[0].transcript;
@@ -100,7 +129,11 @@ function RecordPage({ onNavigate }) {
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error('Speech recognition failed to start:', e);
+    }
   };
 
   const stopTranscription = () => {
@@ -111,43 +144,50 @@ function RecordPage({ onNavigate }) {
     }
   };
 
-  const stopRecordingAndGetBlob = () => {
-    return new Promise((resolve) => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close();
-        audioContextRef.current = null;
-      }
-      setAnalyserNode(null);
+  const stopRecordingAndGetBlob = () => new Promise((resolve) => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    setAnalyserNode(null);
 
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-        mediaRecorderRef.current.onstop = () => {
-          const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-          setAudioBlob(blob);
-          stopTranscription();
-          resolve(blob);
-        };
-        mediaRecorderRef.current.stop();
-      } else {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(blob);
         stopTranscription();
-        resolve(null);
-      }
-    });
-  };
+        resolve(blob);
+      };
+      mediaRecorderRef.current.stop();
+    } else {
+      stopTranscription();
+      resolve(null);
+    }
+  });
 
   const startRecording = async () => {
     try {
       setError('');
+      setTranscript('');
+      transcriptRef.current = '';
+      chunksRef.current = [];
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.75;
       source.connect(analyser);
       audioContextRef.current = audioCtx;
       setAnalyserNode(analyser);
@@ -181,8 +221,6 @@ function RecordPage({ onNavigate }) {
     recordingIdRef.current = null;
   };
 
-  const handleRecord = () => { reset(); startRecording(); };
-
   const handlePause = async (elapsed) => {
     await stopRecordingAndGetBlob();
     setRecordedTime(elapsed);
@@ -195,8 +233,14 @@ function RecordPage({ onNavigate }) {
     const dur = elapsed !== undefined ? elapsed : recordedTime;
     setRecordedTime(dur);
     await new Promise((r) => setTimeout(r, 300));
-    const transcript = transcriptRef.current || finalTranscript;
-    await uploadRecording(blob, dur, transcript);
+    const transcriptText = transcriptRef.current || finalTranscript;
+
+    if (isReplyMode) {
+      await postReplyRecording(blob, dur, transcriptText);
+      return;
+    }
+
+    await uploadRecording(blob, dur, transcriptText);
     setScreen('myrelated');
   };
 
@@ -206,7 +250,7 @@ function RecordPage({ onNavigate }) {
 
   switch (screen) {
     case 'pre':
-      return <PreRecord onRecord={handleRecord} error={error} onNavigate={onNavigate} />;
+      return <PreRecord onRecord={startRecording} error={error} onNavigate={onNavigate} />;
     case 'while':
       return (
         <WhileRecord
@@ -216,6 +260,7 @@ function RecordPage({ onNavigate }) {
           onSave={handleSave}
           startTime={recordedTime}
           onNavigate={onNavigate}
+          saveLabel={isReplyMode ? 'Post Reply' : 'Save'}
         />
       );
     case 'playback':
@@ -228,6 +273,9 @@ function RecordPage({ onNavigate }) {
           onRestart={handleRestart}
           onSave={() => handleSave(recordedTime)}
           onNavigate={onNavigate}
+          title={isReplyMode ? 'Review Your Reply' : 'Listen to Your Recording'}
+          subtitle={isReplyMode ? 'When ready, post this recording as your reply' : 'Press play to hear what you recorded'}
+          saveLabel={isReplyMode ? 'Post Reply' : 'Save Recording'}
         />
       );
     case 'myrelated':
@@ -250,7 +298,7 @@ function RecordPage({ onNavigate }) {
         />
       );
     default:
-      return <PreRecord onRecord={handleRecord} error={error} onNavigate={onNavigate} />;
+      return <PreRecord onRecord={startRecording} error={error} onNavigate={onNavigate} />;
   }
 }
 
