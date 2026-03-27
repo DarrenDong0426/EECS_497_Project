@@ -209,8 +209,9 @@ function RecordPage({ onNavigate, replyTargetRecordingId = null, onReplyComplete
       startTranscription();
       setScreen('while');
     } catch (err) {
-      setError('We need permission to use your microphone. Please allow access and try again.');
-    }
+  console.error('startRecording error:', err.name, err.message);
+  setError(`Error: ${err.name} - ${err.message}`);
+}
   };
 
   const reset = () => {

@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import calendar
 from flask import Blueprint, jsonify, request, send_from_directory
 from models import db, Recording, Reply, RecordingLike
 
@@ -45,16 +46,66 @@ def upload_recording():
 
 @recordings_bp.route('/api/recordings', methods=['GET'])
 def list_recordings():
+    date_str = request.args.get('date')
     user_id = request.args.get('user_id')
     exclude_user = request.args.get('exclude_user')
-    query = Recording.query
-    if user_id:
-        query = query.filter_by(user_id=user_id)
-    if exclude_user:
-        query = query.filter(Recording.user_id != exclude_user)
-    recordings = query.order_by(Recording.created_at.desc()).all()
-    return jsonify([r.to_dict() for r in recordings])
 
+    query = Recording.query
+
+    if date_str:
+        try:
+            target = datetime.strptime(date_str, '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+        start = target.replace(hour=0, minute=0, second=0)
+        end   = target.replace(hour=23, minute=59, second=59)
+        query = query.filter(
+            Recording.user_id == TEMP_USER_ID,
+            Recording.created_at >= start,
+            Recording.created_at <= end,
+        ).order_by(Recording.created_at.asc())
+    else:
+        if user_id:
+            query = query.filter_by(user_id=user_id)
+        if exclude_user:
+            query = query.filter(Recording.user_id != exclude_user)
+        query = query.order_by(Recording.created_at.desc())
+
+    return jsonify([r.to_dict() for r in query.all()])
+
+@recordings_bp.route('/api/recordings/counts', methods=['GET'])
+def get_recording_counts():
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+
+    if not year or not month:
+        return jsonify({'error': 'year and month are required'}), 400
+
+    from sqlalchemy import func # Removed cast and Date
+    import calendar
+
+    # Get all recordings in the given month for the current user
+    start = datetime(year, month, 1)
+    end = datetime(year, month, calendar.monthrange(year, month)[1], 23, 59, 59)
+
+    # Use func.date() instead of cast() - much safer for SQLite!
+    rows = (
+        db.session.query(
+            func.date(Recording.created_at).label('day'),
+            func.count(Recording.id).label('count')
+        )
+        .filter(
+            Recording.user_id == 'temp_user',  # swap for real auth later
+            Recording.created_at >= start,
+            Recording.created_at <= end,
+        )
+        .group_by(func.date(Recording.created_at))
+        .all()
+    )
+
+    # Return { "YYYY-MM-DD": count, ... }
+    counts = {str(row.day): row.count for row in rows}
+    return jsonify(counts)
 
 @recordings_bp.route('/api/recordings/<int:recording_id>', methods=['GET'])
 def get_recording(recording_id):
