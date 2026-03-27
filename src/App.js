@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import AuthPage from './pages/Auth/AuthPage';
 import RecordPage from './pages/Record/RecordPage';
@@ -8,7 +8,7 @@ import ProfilePage from './pages/Profile/ProfilePage';
 
 function App() {
   const { user, loading } = useAuth();
-  const [page, setPage] = useState('record');
+  const [page, setPage] = useState('calendar');
   const [replyTargetRecordingId, setReplyTargetRecordingId] = useState(null);
   const [communitySelectedRecordingId, setCommunitySelectedRecordingId] = useState(null);
 
@@ -38,6 +38,10 @@ function App() {
     setCommunitySelectedRecordingId(null);
   }, []);
 
+  useEffect(() => {
+    if (user) setPage('calendar');
+  }, [user]);
+
   if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Loading...</div>;
   if (!user) return <AuthPage />;
 
@@ -51,7 +55,7 @@ function App() {
     case 'profile':
       return <ProfilePage onNavigate={handleNavigate} />;
     default:
-      return <RecordPage onNavigate={handleNavigate} />;
+      return <CalendarPage onNavigate={handleNavigate} />;
   }
 }
 

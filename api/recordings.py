@@ -67,12 +67,15 @@ def list_recordings():
             Recording.created_at <= end,
         ).order_by(Recording.created_at.asc())
     else:
-        if exclude_user:
+        req_user_id = request.args.get('user_id')
+        if req_user_id:
+            query = query.filter(Recording.user_id == int(req_user_id))
+        elif exclude_user:
             query = query.filter(Recording.user_id != exclude_user)
         else:
             query = query.filter(Recording.shared == True)
         query = query.order_by(Recording.created_at.desc())
-
+        
     return jsonify([r.to_dict() for r in query.all()])
 
 
