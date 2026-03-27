@@ -22,7 +22,8 @@ export default function CalendarPage({ onNavigate }) {
 
   useEffect(() => {
     const month = String(viewMonth + 1).padStart(2, '0');
-    fetch(`${API_BASE_URL}/api/recordings/counts?year=${viewYear}&month=${month}`)
+    
+    fetch(`${API_BASE_URL}/api/recordings/counts?year=${viewYear}&month=${month}&t=${Date.now()}`)
       .then(r => r.ok ? r.json() : {})
       .then(data => {
         const normalizedCounts = {};
@@ -33,7 +34,8 @@ export default function CalendarPage({ onNavigate }) {
         setMonthCounts(normalizedCounts);
       })
       .catch(() => setMonthCounts({}));
-  }, [viewYear, viewMonth]);
+      
+  }, [viewYear, viewMonth, refreshCount]);
 
   const isCurrentMonth = viewYear === today.getFullYear() && viewMonth === today.getMonth();
 
