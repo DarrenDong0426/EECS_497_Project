@@ -1,9 +1,11 @@
 import os
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from sqlalchemy import inspect, text
 from models import db
 from recordings import recordings_bp
+from auth import auth_bp
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'recordings.db')
@@ -13,12 +15,13 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'change-this-to-a-random-secret-in-production'
 
 db.init_app(app)
+JWTManager(app)
 
-
-# Register route blueprints
 app.register_blueprint(recordings_bp)
+app.register_blueprint(auth_bp)
 
 
 def run_schema_updates():

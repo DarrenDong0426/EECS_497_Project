@@ -1,26 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import API_BASE_URL from '../../config';
+import { useAuth } from '../../context/AuthContext';
 import './RecordingPlayer.css';
 
 const formatTime = (s) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 const STOP_WORDS = new Set([
-  'the', 'and', 'a', 'to', 'of', 'in', 'i', 'is', 'that', 'it', 'on', 'you', 
-  'this', 'for', 'but', 'with', 'are', 'have', 'be', 'at', 'or', 'as', 'was', 
-  'so', 'if', 'out', 'not', 'my', 'me', 'we', 'they', 'your', 'about', 'just', 
+  'the', 'and', 'a', 'to', 'of', 'in', 'i', 'is', 'that', 'it', 'on', 'you',
+  'this', 'for', 'but', 'with', 'are', 'have', 'be', 'at', 'or', 'as', 'was',
+  'so', 'if', 'out', 'not', 'my', 'me', 'we', 'they', 'your', 'about', 'just',
   'like', 'can', 'do', 'what', 'all', 'get', 'got', 'there', 'really'
 ]);
 
 const extractKeywords = (text) => {
   if (!text) return "None found";
-  const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g); 
+  const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g);
   if (!words) return "None found";
   const counts = {};
   words.forEach(w => {
-    if (!STOP_WORDS.has(w)) {
-      counts[w] = (counts[w] || 0) + 1;
-    }
+    if (!STOP_WORDS.has(w)) counts[w] = (counts[w] || 0) + 1;
   });
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   const topWords = sorted.slice(0, 3).map(entry => entry[0]);
@@ -29,6 +28,7 @@ const extractKeywords = (text) => {
 };
 
 export default function RecordingPlayer({ recording, playingId, onPlay, onStop, onDelete }) {
+  const { authFetch } = useAuth();
   const [time, setTime] = useState(0);
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
@@ -77,7 +77,7 @@ export default function RecordingPlayer({ recording, playingId, onPlay, onStop, 
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/recordings/${recording.id}`, {
+      const res = await authFetch(`${API_BASE_URL}/api/recordings/${recording.id}`, {
         method: 'DELETE',
       });
       if (res.ok) {

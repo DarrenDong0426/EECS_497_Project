@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import './Record.css';
-
 import API from '../../config';
 
 function SimilarRecordings({ recordingId }) {
+  const { authFetch } = useAuth();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [shown, setShown] = useState(false);
@@ -14,7 +15,7 @@ function SimilarRecordings({ recordingId }) {
     if (!recordingId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/recordings/${recordingId}/similar`);
+      const res = await authFetch(`${API}/api/recordings/${recordingId}/similar`);
       const data = await res.json();
       setResults(data);
     } catch (err) {
@@ -24,7 +25,6 @@ function SimilarRecordings({ recordingId }) {
     setShown(true);
   };
 
-  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -35,28 +35,14 @@ function SimilarRecordings({ recordingId }) {
   }, []);
 
   const togglePlay = (id) => {
-    // If already playing this one, stop it
     if (playingId === id) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
       setPlayingId(null);
       return;
     }
-
-    // Stop any currently playing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-
-    // Play the new one
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     const audio = new Audio(`${API}/api/recordings/${id}/audio`);
-    audio.onended = () => {
-      setPlayingId(null);
-      audioRef.current = null;
-    };
+    audio.onended = () => { setPlayingId(null); audioRef.current = null; };
     audio.play();
     audioRef.current = audio;
     setPlayingId(id);
@@ -75,7 +61,6 @@ function SimilarRecordings({ recordingId }) {
   return (
     <div className="similar-section">
       <div className="similar-header">Similar Recordings</div>
-
       {results.length === 0 ? (
         <p className="similar-empty">No similar recordings found yet. Record more to build your library!</p>
       ) : (
@@ -83,27 +68,19 @@ function SimilarRecordings({ recordingId }) {
           {results.map((rec) => (
             <div key={rec.id} className="similar-card">
               <div className="similar-card-top">
-                <button
-                  className="btn-similar-play"
-                  onClick={() => togglePlay(rec.id)}
-                >
+                <button className="btn-similar-play" onClick={() => togglePlay(rec.id)}>
                   {playingId === rec.id ? '⏸' : '▶'}
                 </button>
                 <div className="similar-card-info">
                   <div className="similar-card-date">
-                    {new Date(rec.created_at).toLocaleDateString('en-US', {
-                      month: 'short', day: 'numeric', year: 'numeric',
-                      hour: 'numeric', minute: '2-digit',
-                    })}
+                    {new Date(rec.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </div>
                   <div className="similar-card-meta">
                     {formatTime(rec.duration)} · {Math.round(rec.similarity * 100)}% match
                   </div>
                 </div>
               </div>
-              {rec.transcript && (
-                <div className="similar-card-transcript">{rec.transcript}</div>
-              )}
+              {rec.transcript && <div className="similar-card-transcript">{rec.transcript}</div>}
             </div>
           ))}
         </div>

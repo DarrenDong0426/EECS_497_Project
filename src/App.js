@@ -1,10 +1,13 @@
 import React, { useState, useCallback } from 'react';
+import { useAuth } from './context/AuthContext';
+import AuthPage from './pages/Auth/AuthPage';
 import RecordPage from './pages/Record/RecordPage';
 import CalendarPage from './pages/Calendar/CalendarPage';
 import CommunityPage from './pages/Community/CommunityPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 
 function App() {
+  const { user, loading } = useAuth();
   const [page, setPage] = useState('record');
   const [replyTargetRecordingId, setReplyTargetRecordingId] = useState(null);
   const [communitySelectedRecordingId, setCommunitySelectedRecordingId] = useState(null);
@@ -12,12 +15,9 @@ function App() {
   const handleNavigate = useCallback((destination) => {
     if (typeof destination === 'string') {
       setPage(destination);
-      if (destination !== 'record') {
-        setReplyTargetRecordingId(null);
-      }
+      if (destination !== 'record') setReplyTargetRecordingId(null);
       return;
     }
-
     if (destination?.type === 'reply-recording') {
       setReplyTargetRecordingId(destination.recordingId);
       setPage('record');
@@ -38,26 +38,16 @@ function App() {
     setCommunitySelectedRecordingId(null);
   }, []);
 
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Loading...</div>;
+  if (!user) return <AuthPage />;
+
   switch (page) {
     case 'calendar':
       return <CalendarPage onNavigate={handleNavigate} />;
     case 'record':
-      return (
-        <RecordPage
-          onNavigate={handleNavigate}
-          replyTargetRecordingId={replyTargetRecordingId}
-          onReplyComplete={handleReplyComplete}
-        />
-      );
+      return <RecordPage onNavigate={handleNavigate} replyTargetRecordingId={replyTargetRecordingId} onReplyComplete={handleReplyComplete} />;
     case 'community':
-      return (
-        <CommunityPage
-          onNavigate={handleNavigate}
-          onStartReplyRecording={handleStartReplyRecording}
-          initialSelectedRecordingId={communitySelectedRecordingId}
-          onInitialSelectionConsumed={clearInitialSelection}
-        />
-      );
+      return <CommunityPage onNavigate={handleNavigate} onStartReplyRecording={handleStartReplyRecording} initialSelectedRecordingId={communitySelectedRecordingId} onInitialSelectionConsumed={clearInitialSelection} />;
     case 'profile':
       return <ProfilePage onNavigate={handleNavigate} />;
     default:

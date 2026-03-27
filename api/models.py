@@ -68,3 +68,22 @@ class RecordingLike(db.Model):
     __table_args__ = (
         db.UniqueConstraint('recording_id', 'user_id', name='uq_recording_like_user'),
     )
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    username = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    avatar_filename = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'username': self.username,
+            'avatar_filename': self.avatar_filename,
+            'created_at': self.created_at.isoformat(),
+        }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import API_BASE_URL from '../../config';
 import RecordingPlayer from '../RecordingPlayer/RecordingPlayer';
+import { useAuth } from '../../context/AuthContext';
 import './DayDrawer.css';
 
 const formatDateLabel = (key) => {
@@ -11,6 +12,7 @@ const formatDateLabel = (key) => {
 };
 
 export default function DayDrawer({ dateKey, onClose, onRecordingDeleted }) {
+  const { authFetch } = useAuth();
   const [recordings, setRecordings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +21,7 @@ export default function DayDrawer({ dateKey, onClose, onRecordingDeleted }) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`${API_BASE_URL}/api/recordings?date=${dateKey}`)
+    authFetch(`${API_BASE_URL}/api/recordings?date=${dateKey}`)
       .then(r => {
         if (!r.ok) throw new Error('Failed to load recordings');
         return r.json();
@@ -56,10 +58,9 @@ export default function DayDrawer({ dateKey, onClose, onRecordingDeleted }) {
               playingId={playingId}
               onPlay={() => setPlayingId(rec.id)}
               onStop={() => setPlayingId(null)}
-              // NEW: Remove from UI list, and alert the Calendar
               onDelete={(deletedId) => {
                 setRecordings(prev => prev.filter(r => r.id !== deletedId));
-                if (onRecordingDeleted) onRecordingDeleted(); 
+                if (onRecordingDeleted) onRecordingDeleted();
               }}
             />
           ))}

@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import NavBar from '../../components/NavBar/NavBar';
 import DayDrawer from '../../components/DayDrawer/DayDrawer';
+import { useAuth } from '../../context/AuthContext';
 import API_BASE_URL from '../../config';
-import './Calendar.css'; 
+import './Calendar.css';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -12,29 +13,29 @@ const MONTHS = [
 const YEARS = Array.from({ length: 10 }, (_, i) => 2022 + i);
 
 export default function CalendarPage({ onNavigate }) {
+  const { authFetch } = useAuth();
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selectedDateKey, setSelectedDateKey] = useState(null);
   const [monthCounts, setMonthCounts] = useState({});
   const [refreshCount, setRefreshCount] = useState(0);
-  
 
   useEffect(() => {
     const month = String(viewMonth + 1).padStart(2, '0');
-    
-    fetch(`${API_BASE_URL}/api/recordings/counts?year=${viewYear}&month=${month}&t=${Date.now()}`)
+
+    authFetch(`${API_BASE_URL}/api/recordings/counts?year=${viewYear}&month=${month}&t=${Date.now()}`)
       .then(r => r.ok ? r.json() : {})
       .then(data => {
         const normalizedCounts = {};
         for (const [key, value] of Object.entries(data)) {
-          const cleanKey = key.split(' ')[0]; 
+          const cleanKey = key.split(' ')[0];
           normalizedCounts[cleanKey] = (normalizedCounts[cleanKey] || 0) + value;
         }
         setMonthCounts(normalizedCounts);
       })
       .catch(() => setMonthCounts({}));
-      
+
   }, [viewYear, viewMonth, refreshCount]);
 
   const isCurrentMonth = viewYear === today.getFullYear() && viewMonth === today.getMonth();
@@ -59,9 +60,9 @@ export default function CalendarPage({ onNavigate }) {
   }, [viewYear, viewMonth, refreshCount]);
 
   const dateKey = (day) => `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  
+
   const isToday = (day) => day && viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate();
-  
+
   const isPast = (day) => {
     if (!day) return false;
     const d = new Date(viewYear, viewMonth, day);
@@ -122,7 +123,6 @@ export default function CalendarPage({ onNavigate }) {
                     <span className={`day-num ${todayFlag ? 'today' : ''} ${isSelected ? 'selected' : ''}`}>
                       {day}
                     </span>
-
                     {(pastFlag || todayFlag) && count > 0 && (
                       <div className="count-badge-wrap">
                         <span className={`count-badge ${isSelected ? 'selected' : ''}`}>{count}</span>
@@ -146,10 +146,10 @@ export default function CalendarPage({ onNavigate }) {
       </div>
 
       {selectedDateKey && (
-        <DayDrawer 
-          dateKey={selectedDateKey} 
-          onClose={() => setSelectedDateKey(null)} 
-          onRecordingDeleted={() => setRefreshCount(prev => prev + 1)} // <-- Add this!
+        <DayDrawer
+          dateKey={selectedDateKey}
+          onClose={() => setSelectedDateKey(null)}
+          onRecordingDeleted={() => setRefreshCount(prev => prev + 1)}
         />
       )}
 
