@@ -6,9 +6,14 @@
 }
 .player-meta {
   display: flex;
-  justifyContent: space-between;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+}
+.meta-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 .player-time {
   font-size: 13px;
@@ -18,6 +23,41 @@
 .player-duration {
   font-size: 12px;
   color: #9099b8;
+}
+.delete-btn {
+  background: #e8506a; /* The red gradient color as a solid background */
+  border: none;
+  color: #fff; /* White text */
+  font-size: 11px; 
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase; /* Makes it look sharp inside a box */
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 6px 12px; /* Gives the box some breathing room around the text */
+  border-radius: 8px; /* Smooth rounded corners */
+  margin-left: auto; /* Keeps it anchored to the far right */
+  transition: background 0.2s, transform 0.2s;
+}
+.delete-btn:hover {
+  background: #d43f57; /* Slightly darker red on hover for feedback */
+  transform: scale(1.05); /* Subtle pop effect */
+  text-decoration: none;
+}
+.player-keywords {
+  font-size: 12px;
+  color: #4a5080;
+  background: #eef0f8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  display: inline-block;
+  border: 1px solid #dde1ef;
+}
+.player-keywords strong {
+  color: #1a1a2e;
+  font-weight: 700;
+  margin-right: 4px;
 }
 .player-transcript {
   font-size: 13px;

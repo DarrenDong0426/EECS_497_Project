@@ -17,6 +17,8 @@ export default function CalendarPage({ onNavigate }) {
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selectedDateKey, setSelectedDateKey] = useState(null);
   const [monthCounts, setMonthCounts] = useState({});
+  const [refreshCount, setRefreshCount] = useState(0);
+  
 
   useEffect(() => {
     const month = String(viewMonth + 1).padStart(2, '0');
@@ -52,7 +54,7 @@ export default function CalendarPage({ onNavigate }) {
     for (let i = 0; i < firstDay; i++) cells.push(null);
     for (let d = 1; d <= daysInMonth; d++) cells.push(d);
     return cells;
-  }, [viewYear, viewMonth]);
+  }, [viewYear, viewMonth, refreshCount]);
 
   const dateKey = (day) => `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   
@@ -142,7 +144,11 @@ export default function CalendarPage({ onNavigate }) {
       </div>
 
       {selectedDateKey && (
-        <DayDrawer dateKey={selectedDateKey} onClose={() => setSelectedDateKey(null)} />
+        <DayDrawer 
+          dateKey={selectedDateKey} 
+          onClose={() => setSelectedDateKey(null)} 
+          onRecordingDeleted={() => setRefreshCount(prev => prev + 1)} // <-- Add this!
+        />
       )}
 
       <NavBar active="calendar" onNavigate={onNavigate} />

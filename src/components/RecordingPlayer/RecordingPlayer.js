@@ -5,7 +5,30 @@ import './RecordingPlayer.css';
 const formatTime = (s) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
-export default function RecordingPlayer({ recording, playingId, onPlay, onStop }) {
+const STOP_WORDS = new Set([
+  'the', 'and', 'a', 'to', 'of', 'in', 'i', 'is', 'that', 'it', 'on', 'you', 
+  'this', 'for', 'but', 'with', 'are', 'have', 'be', 'at', 'or', 'as', 'was', 
+  'so', 'if', 'out', 'not', 'my', 'me', 'we', 'they', 'your', 'about', 'just', 
+  'like', 'can', 'do', 'what', 'all', 'get', 'got', 'there', 'really'
+]);
+
+const extractKeywords = (text) => {
+  if (!text) return "None found";
+  const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g); 
+  if (!words) return "None found";
+  const counts = {};
+  words.forEach(w => {
+    if (!STOP_WORDS.has(w)) {
+      counts[w] = (counts[w] || 0) + 1;
+    }
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const topWords = sorted.slice(0, 3).map(entry => entry[0]);
+  if (topWords.length === 0) return "None found";
+  return topWords.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(', ');
+};
+
+export default function RecordingPlayer({ recording, playingId, onPlay, onStop, onDelete }) {
   const [time, setTime] = useState(0);
   const audioRef = useRef(null);
   const intervalRef = useRef(null);
@@ -49,13 +72,42 @@ export default function RecordingPlayer({ recording, playingId, onPlay, onStop }
     setTime(Math.floor(next));
   };
 
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this diary entry?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/recordings/${recording.id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        if (onDelete) onDelete(recording.id);
+      } else {
+        alert("Failed to delete recording.");
+      }
+    } catch (err) {
+      console.error("Error deleting recording:", err);
+    }
+  };
+
+  const keywords = extractKeywords(recording.transcript);
+
   return (
     <div className="player-card">
       <div className="player-meta">
-        <span className="player-time">
-          {new Date(recording.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-        </span>
-        <span className="player-duration">{formatTime(recording.duration)}</span>
+        <div className="meta-left">
+          <span className="player-time">
+            {new Date(recording.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+          </span>
+          <span className="player-duration">{formatTime(recording.duration)}</span>
+        </div>
+        <button className="delete-btn" onClick={handleDelete} title="Delete entry">
+          Delete
+        </button>
+      </div>
+
+      <div className="player-keywords">
+        <strong>Keywords:</strong> {keywords}
       </div>
 
       {recording.transcript ? (

@@ -10,7 +10,7 @@ const formatDateLabel = (key) => {
   });
 };
 
-export default function DayDrawer({ dateKey, onClose }) {
+export default function DayDrawer({ dateKey, onClose, onRecordingDeleted }) {
   const [recordings, setRecordings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,6 +56,11 @@ export default function DayDrawer({ dateKey, onClose }) {
               playingId={playingId}
               onPlay={() => setPlayingId(rec.id)}
               onStop={() => setPlayingId(null)}
+              // NEW: Remove from UI list, and alert the Calendar
+              onDelete={(deletedId) => {
+                setRecordings(prev => prev.filter(r => r.id !== deletedId));
+                if (onRecordingDeleted) onRecordingDeleted(); 
+              }}
             />
           ))}
         </div>
